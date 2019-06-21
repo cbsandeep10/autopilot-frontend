@@ -10,9 +10,19 @@ var goals = {}
 goals['Hiking'] = ['Mt. Everest', 'Mt. Humphreys']
 goals['Youtube'] = ['Hit 5M subs']
 var actions = {}
-actions['Mt. Everest'] = ['Apply for permit','Get gear', 'Train hard', 'Finish course']
+actions['Mt. Everest'] = ['Apply for permit', 'Train hard', 'Finish course']
 actions['Mt. Humphreys'] = ['GPS', 'Get gear']
 actions['Hit 5M subs'] = ['Purchase new mic and camera', 'Edit the pending videos']
+contexts = {}
+contexts['Apply for permit'] = ['apply online','permit']
+contexts['Get gear'] = ['shop']
+contexts['Train hard'] = ['hit gym']
+contexts['Finish course'] = ['course']
+contexts['GPS'] = ['gps']
+contexts['Get gear'] = ['buy gear']
+contexts['Purchase new mic and camera'] = ['latest']
+contexts['Edit the pending videos'] = ['editing']
+
 
 var current_project = projects[0];
 var current_goal = goals[current_project][0]
@@ -42,12 +52,18 @@ function fill_actions(goal){
         return;
     }
     for(i =0;i<actions[goal].length; i++){
-        $("#project-actions").append('<a href="#" class="list-group-item list-group-item-action action">'+actions[goal][i]+'</a>');
+      var link = '<a href="#" class="list-group-item list-group-item-action action">'+actions[goal][i] +' ';
+      for(j=0;j<contexts[actions[goal][i]].length;j++){
+        link += '<span class="badge badge-secondary">'+ contexts[actions[goal][i]][j]+'</span>'
+      }
+      link += '</a>';
+      $("#project-actions").append(link);
     }
     
 }
 
 $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     fill_projects();
     $(document).on('click','.project',function(e) {
         $("#goal").show();
@@ -91,6 +107,10 @@ $(document).ready(function () {
             actions[current_goal] = [];
           }
       actions[current_goal].push(name);
+      if(!(name in contexts)){
+        contexts[name] = [];
+      }
+      contexts[name] = $("#action-context").val().split(",")
       $('#actionModal').modal('toggle');
       fill_actions(current_goal);
     });
